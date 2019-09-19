@@ -87,7 +87,7 @@ WSGI_APPLICATION = 'consultorio.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'consultorio',
+        'NAME': 'dermatologia',
         'USER': 'postgres',
         'PASSWORD': 'add150806',
         'HOST': '127.0.0.1',
