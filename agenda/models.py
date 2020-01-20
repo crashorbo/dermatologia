@@ -96,7 +96,7 @@ class Reconsulta(models.Model):
 
 
 class Examenclinico(models.Model):
-    def _generar_ruta_archivo(self, instance, filename):
+    def _generar_ruta_archivo(instance, filename):
         # El primer paso es extraer la extension de la imagen del
         # archivo original
         extension = os.path.splitext(filename)[1][1:]
