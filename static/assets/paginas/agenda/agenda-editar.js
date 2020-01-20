@@ -4,13 +4,53 @@ $(document).ready(function(){
       url: Urls.agenda_espera(),
       type: 'get',  
       success: function(data){
-        $('.chatonline').html(data);
+        $('.paciente-espera-lista').html(data);
       }
     });
-  });
-  selectipo();
+  });  
+
   $.fn.modal.Constructor.prototype.enforceFocus = function () {};
+
   agudezaclose();
+  
+  $('.dropify').dropify({
+    messages: {
+      'default': 'Arrastra y suelta un archivo aquí o haz clic',
+      'replace': 'Arrastra y suelta o haz clic para reemplazar',
+      'remove':  'Eliminar',
+      'error':   'Vaya, sucedió algo mal.'
+    }
+  });
+
+  var drEvent = $('#input-file-events').dropify();
+
+  drEvent.on('dropify.beforeClear', function(event, element) {
+      return confirm("Do you really want to delete \"" + element.file.name + "\" ?");
+  });
+
+  drEvent.on('dropify.afterClear', function(event, element) {
+      alert('File deleted');
+  });
+
+  drEvent.on('dropify.errors', function(event, element) {
+      console.log('Has Errors');
+  });
+
+  var drDestroy = $('#input-file-to-destroy').dropify();
+  drDestroy = drDestroy.data('dropify')
+  $('#toggleDropify').on('click', function(e) {
+      e.preventDefault();
+      if (drDestroy.isDropified()) {
+          drDestroy.destroy();
+      } else {
+          drDestroy.init();
+      }
+  });
+  $('.examen-list').slimScroll({    
+    height: '375px',
+    size: "5px",
+    color: '#dcdcdc' 
+ });
 });
 
 $(document).keydown(function(e) { 
@@ -38,6 +78,10 @@ $('#recetar').on('click', function(e){
   $('#recetaform')[0].reset();
   $("#id_medicamento").val('').trigger("change");
   $('#receta-modal').modal('show');
+});
+
+$('#examen-clinico').on('click', function(e){    
+  $('#examen-modal').modal('show');
 });
 
 $('#form-guardar').on('submit', function (e) {
@@ -89,6 +133,30 @@ $('#diagform').on('submit', function (e) {
       success: function(data){
         $('.enviod').val('');
         $("#diagnosticos").html(data);
+      },
+      error: function(xhr,errmsg,err) {
+        // Show an error
+        $('#results').html("<div class='alert-box alert radius' data-alert>"+
+        "Oops! We have encountered an error. <a href='#' class='close'>&times;</a></div>"); // add error to the dom
+        console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+      }
+  })
+});
+
+$('#examenform').on('submit', function (e) {
+  e.preventDefault();
+  var $formData = new FormData(this);
+  var $thisUrl = $(this).attr('action');
+  var $thisMethod = $(this).attr('method');
+  $.ajax({
+      method: $thisMethod,
+      url: $thisUrl,
+      data: $formData,
+      cache: false,
+      contentType: false,
+      processData: false,            
+      success: function(data){
+        location.reload();
       },
       error: function(xhr,errmsg,err) {
         // Show an error
@@ -178,6 +246,7 @@ $('#tratform').on('submit', function (e) {
       url: $thisUrl,
       data: $formData,
       success: function(data){
+        $('.envioct').val('1');
         $('.enviot').val('');
         $("#tratamientos").html(data);
       },
@@ -323,75 +392,9 @@ function imprimirlista(e, obj)
   window.open(this_url,"reporte","height=600,width=700,status=no, toolbar=no,menubar=no,location=no,scrollbars=yes");
 }
 
-
-$('#selectipo').on('change', function(){
-  var valor = "";
-  aux = $(this).val();
-  aux.forEach(element => {
-    if (valor == "")
-      valor = element;
-    else
-      valor = valor+","+element;
-  });
-  $('#id_tipo_lente').val(valor);
-  autoguardado()
-});
-
-function selectipo(){
-  valor = $('#id_tipo_lente').val();
-  aux = valor.split(",");
-  $('#selectipo').selectpicker('val', aux);
-}
 $('.autoguardado').on('change', function(){
   autoguardado();
 });
-$('#id_dre1').on('change', function(){
-  $('#id_drc1').val(transformador($(this).val()));
-  autoguardado();
-});
-$('#id_dre2').on('change', function(){
-  $('#id_drc2').val(transformador($(this).val()));
-  autoguardado();
-});
-$('#id_dre3').on('change', function(){
-  $('#id_drc3').val($(this).val());
-  autoguardado();
-});
-$('#id_ddc2').on('change', function(){
-  $('#id_adicion').val(transformador($(this).val()));
-  autoguardado();
-});
-$('#id_ire1').on('change', function(){
-  $('#id_irc1').val(transformador($(this).val()));
-  autoguardado();
-});
-$('#id_ire2').on('change', function(){
-  $('#id_irc2').val(transformador($(this).val()));
-  autoguardado();
-});
-$('#id_ire3').on('change', function(){
-  $('#id_irc3').val($(this).val());
-  autoguardado();
-});
-
-function transformador(t){
-  var dosdecimales = parseFloat(t).toFixed(2);
-  if(isNaN(dosdecimales))
-  {
-    return "";
-  }
-  else{
-    if(dosdecimales==0)
-    {
-      return "";
-    }
-    if(dosdecimales > 0)
-    {
-      dosdecimales = '+'+dosdecimales;
-    }
-  }
-  return dosdecimales;
-}
 
 $('#id_medicamento').select2({
   language: 'es',

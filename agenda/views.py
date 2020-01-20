@@ -19,8 +19,8 @@ from paciente.templatetags import paciente_tags
 from configuracion.models import Tipolente
 from core.models import Movdiario
 from paciente.forms import PacienteForm
-from .models import Agenda, Diagnostico, Tratamiento, Agendaserv, Receta, Reconsulta, Agendaserv
-from .forms import AgendaForm, DiagnosticoForm, TratamientoForm, ServicioFormset, RecetaForm, ReconsultaForm, AgendaservicioForm
+from .models import Agenda, Diagnostico, Tratamiento, Agendaserv, Receta, Reconsulta, Agendaserv, Examenclinico
+from .forms import AgendaForm, DiagnosticoForm, TratamientoForm, ServicioFormset, RecetaForm, ReconsultaForm, AgendaservicioForm, ExamenclinicoForm
 from io import BytesIO
 from decimal import Decimal, getcontext
 from django.utils import formats
@@ -314,8 +314,7 @@ class AgendaEditar(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        agenda = Agenda.objects.get(id=self.kwargs['pk'])
-        visor = Agenda.objects.filter(paciente=agenda.paciente).exclude(id=agenda.id).order_by('-fecha')
+        agenda = Agenda.objects.get(id=self.kwargs['pk'])        
         diag_data = {'agenda': self.kwargs['pk']}
         descuento = False
         for item in agenda.agendaserv_set.all():
@@ -324,15 +323,13 @@ class AgendaEditar(UpdateView):
                 break
         diagnostico = DiagnosticoForm(initial=diag_data)
         tratamiento = TratamientoForm(initial=diag_data)
+        examenclinico = ExamenclinicoForm(initial=diag_data)
         receta = RecetaForm(initial=diag_data)
         control = ReconsultaForm(initial=diag_data)
-        tipolentes = Tipolente.objects.all()
-        if len(visor) > 0:
-            context['visor'] = visor[0]
-        else:
-            context['visor'] = None
+        tipolentes = Tipolente.objects.all()        
         context['tipolentes'] = tipolentes
         context['diagform'] = diagnostico
+        context['examenform'] = examenclinico
         context['tratform'] = tratamiento
         context['recetaform'] = receta
         context['controlform'] = control
@@ -474,6 +471,19 @@ class RecetaCrear(CreateView):
         consulta = Agenda.objects.get(pk=model.agenda.id)
         model.save()
         return render(self.request, 'agenda/ajax/recetas.html', context={'consulta': consulta })
+
+class ExamenCrear(CreateView):
+    model = Examenclinico
+    form_class = ExamenclinicoForm
+    template_name = 'paciente/success.html'
+
+    def form_valid(self, form):
+        model = form.save(commit=False)        
+        model.save()
+        return JsonResponse({"success": True})
+
+    def form_invalid(self, form):
+        return JsonResponse({"success": False})
 
 class RecetaEliminar(DeleteView):
     model = Receta

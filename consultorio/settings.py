@@ -123,7 +123,7 @@ LOGOUT_REDIRECT_URL = '/'
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
 
-LANGUAGE_CODE = 'es-bo'
+LANGUAGE_CODE = 'es-mx'
 
 TIME_ZONE = 'America/La_Paz'
 

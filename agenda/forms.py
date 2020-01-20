@@ -1,6 +1,6 @@
 from django import forms
 from django.forms.models import inlineformset_factory
-from .models import Agenda, Diagnostico, Tratamiento, Agendaserv, Receta, Reconsulta
+from .models import Agenda, Diagnostico, Tratamiento, Agendaserv, Receta, Reconsulta, Examenclinico
 from dal import autocomplete
 from paciente.models import Paciente
 from seguro.models import Seguro
@@ -14,10 +14,7 @@ class AgendaForm(forms.ModelForm):
   class Meta:
     model = Agenda
     fields = ('paciente', 'seguro', 'fecha', 'fecha_consulta', 'hora_inicio', 'hora_fin', 'tipo', 'prioridad', 'procedencia',
-              'matricula', 'tipo_beneficiario', 'antocu', 'antsis', 'motivo', 'dsc', 'dcc', 'dre1', 'dre2', 'dre3', 'dau',
-              'ddc1', 'ddc2', 'dph', 'dci', 'dcl', 'drc1', 'drc2', 'drc3', 'isc', 'icc', 'ire1', 'ire2', 'ire3', 'iau',
-              'idc1', 'idc2', 'iph', 'ici', 'icl', 'irc1', 'irc2', 'irc3', 'adicion', 'tipo_lente', 'dto', 'ito', 'dbio',
-              'ibio', 'dfdo', 'ifdo', 'otros', 'impav', 'control')
+              'matricula', 'tipo_beneficiario', 'antecedentes', 'motivo_consulta', 'control')
 
     widgets = {
       'fecha': forms.DateInput(attrs={'class': 'form-control fecha form-control-sm'}),
@@ -28,47 +25,8 @@ class AgendaForm(forms.ModelForm):
       'procedencia': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
       'matricula': forms.TextInput(attrs={'class': 'form-control form-control-sm'}),
       'tipo_beneficiario': forms.Select(attrs={'class': 'form-control form-control-sm'}),
-      'antocu': forms.Textarea(attrs={'class': 'form-control form-control-sm autoguardado', 'tabindex': 1, 'rows': 2}),
-      'antsis': forms.Textarea(attrs={'class': 'form-control form-control-sm autoguardado', 'tabindex': 2, 'rows': 2}),
-      'motivo': forms.Textarea(attrs={'class': 'form-control form-control-sm autoguardado', 'tabindex': 3, 'rows': 2}),
-      'dsc': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 4}), 
-      'dcc': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 5}), 
-      'dre1': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center', 'tabindex': 6}), 
-      'dre2': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center', 'tabindex': 7}),
-      'dre3': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center', 'tabindex': 8}),
-      'dau': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 9}),
-      'ddc1': forms.Select(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 10}),
-      'ddc2': forms.TextInput(attrs={'class': 'form-control form-control-sm  text-center', 'tabindex': 11}),
-      'dph': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 12}),
-      'dci': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 13}),
-      'dcl': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 14}),
-      'drc1': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 15}),
-      'drc2': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 16}),
-      'drc3': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 17}),
-      'isc': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 18}), 
-      'icc': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 19}), 
-      'ire1': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center', 'tabindex': 20}), 
-      'ire2': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center', 'tabindex': 21}),
-      'ire3': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center', 'tabindex': 22}),
-      'iau': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 23}),
-      'idc1': forms.Select(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 24}),
-      'idc2': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 25}),
-      'iph': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 26}),
-      'ici': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 27}),
-      'icl': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 28}),
-      'irc1': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 29}),
-      'irc2': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 30}),
-      'irc3': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 31}),
-      'adicion': forms.TextInput(attrs={'class': 'form-control form-control-sm text-center autoguardado', 'tabindex': 32}),
-      'tipo_lente': forms.TextInput(attrs={'class': 'form-control form-control-sm autoguardado', 'tabindex': 33}),
-      'dto': forms.TextInput(attrs={'class': 'form-control form-control-sm autoguardado', 'tabindex': 34}),
-      'ito': forms.TextInput(attrs={'class': 'form-control form-control-sm autoguardado', 'tabindex': 35}),
-      'dbio': forms.Textarea(attrs={'class': 'form-control form-control-sm autoguardado', 'rows': 2, 'tabindex': 36}),
-      'ibio': forms.Textarea(attrs={'class': 'form-control form-control-sm autoguardado', 'rows': 2, 'tabindex': 37}),
-      'dfdo': forms.Textarea(attrs={'class': 'form-control form-control-sm autoguardado', 'rows': 2, 'tabindex': 38}),
-      'ifdo': forms.Textarea(attrs={'class': 'form-control form-control-sm autoguardado', 'rows': 2, 'tabindex': 39}),
-      'otros': forms.Textarea(attrs={'class': 'form-control form-control-sm autoguardado', 'rows': 2, 'tabindex': 40}),
-      'impav': forms.CheckboxInput(attrs={'class': 'form-control form-control-sm autoguardado', 'tabindex': 33}),
+      'antecedentes': forms.Textarea(attrs={'class': 'form-control form-control-sm autoguardado', 'tabindex': 1, 'rows': 2}),
+      'motivo_consulta': forms.Textarea(attrs={'class': 'form-control form-control-sm autoguardado', 'tabindex': 3, 'rows': 2}),      
     }
 
 class DiagnosticoForm(forms.ModelForm):
@@ -83,9 +41,10 @@ class DiagnosticoForm(forms.ModelForm):
 class TratamientoForm(forms.ModelForm):
   class Meta:
     model = Tratamiento
-    fields = ('detalle', 'agenda')
+    fields = ('detalle', 'agenda', 'cantidad')
     widgets = {
       'agenda': forms.HiddenInput(),
+      'cantidad': forms.NumberInput(attrs={'class': 'form-control form-control-sm envioct'}),
       'detalle': forms.TextInput(attrs={'class': 'form-control form-control-sm enviot', 'tabindex': 42}),
     }
 
@@ -132,4 +91,15 @@ class ReconsultaForm(forms.ModelForm):
     widgets = {
       'agenda': forms.HiddenInput(),
       'detalle': forms.Textarea(attrs={'class': 'form-control form-control-sm enviocontrol', 'rows': 2, 'tabindex': 43}),
+    }
+
+class ExamenclinicoForm(forms.ModelForm):
+  class Meta:
+    model = Examenclinico
+    fields = ('agenda', 'detalle', 'fecha_archivo', 'archivo')
+    widgets = {
+      'agenda': forms.HiddenInput(),
+      'detalle': forms.Textarea(attrs={'class': 'form-control form-control-sm enviocontrol', 'rows': 2, 'tabindex': 43}),
+      'fecha_archivo': forms.DateInput(attrs={'class': 'form-control fecha form-control-sm'}),
+      'archivo': forms.FileInput(attrs={'class': "dropify", 'capture': 'camera', 'data-height': '120', 'data-default-file': '/media/Imagenes/no-image.png'})
     }

@@ -5,41 +5,33 @@
 {% load paciente_tags %}
 {% block css %}
 <link href="{% static "assets/plugins/select2/dist/css/select2.css" %}" rel="stylesheet" type="text/css" />
-<link href="{% static "assets/plugins/bootstrap-selectf/dist/css/bootstrap-select.css" %}" rel="stylesheet" type="text/css" />
+<link href="{% static "assets/plugins/bootstrap-selectf/dist/css/bootstrap-select.css" %}" rel="stylesheet"
+  type="text/css" />
+<link rel="stylesheet" href="{% static "assets/plugins/dropify/dist/css/dropify.min.css" %}">
 {% endblock %}
 
 {% block contenido %}
-<button id="paciente-espera" class="right-side-toggle waves-effect waves-light btn-success btn btn-circle btn-sm pull-right m-l-10"><i class="icon-calendar text-white"></i></button>
-  <div class="row">
-    <div id="seccion-consulta" class="col-md-6 col-sm-12">
-    <form id="form-guardar" action="{% url 'agenda-editar' pk=consulta.id %}" method="post" autocomplete=off>
-      <div class="row">
-        <div class="col-md-1 col-sm-2 fixribbon">
-          <div class="row">
-            <div class="{% if descuento %}miribbondesc{% else %}miribbon{% endif %} col-md-12 mytooltip">D.P.                
-            </div>
-            <div class="hide">
-              {{ form.paciente }}
-              {{ form.procedencia }}
-              {{ form.seguro }}
-              {{ form.fecha }}
-              {{ form.hora_inicio }}
-              {{ form.hora_fin }}
-              {{ form.tipo }}
-              {{ form.prioridad }}
-              {{ form.tipo_beneficiario }}
-              {{ form.matricula }}
-              {{ form.fecha_consulta }}
+<button id="paciente-espera"
+  class="right-side-toggle waves-effect waves-light btn-success btn btn-circle btn-sm pull-right m-l-10"><i
+    class="icon-calendar text-white"></i></button>
+<div class="row">
+  <div id="seccion-consulta" class="col-md-6 col-sm-12">
+    <div class="row">
+      <div class="col-md-12 col-sm-12">
+        <div class="ribbon-wrapper card m-b-5">
+          <div class="ribbon ribbon-manantial">
+            Datos Personales
           </div>
-          </div>
-        </div>
-        <div class="col-md-11 col-sm-10">
-          <div class="row">
+          <div class="row ribbon-content">
             <div class="col-md-9 col-sm-12">
-              <h6>Nombre: <strong>{{ consulta.paciente.nombres|add:" "|add:consulta.paciente.apellidos }}</strong></h6>
+              <h6>Nombre: <strong>{{ consulta.paciente.nombres|add:" "|add:consulta.paciente.apellidos }}</strong>
+              </h6>
             </div>
             <div class="col-md-3 col-sm-12 text-right">
               <h6>Edad: <strong>{{ consulta.paciente.fecha_nacimiento|edad }}</strong></h6>
+            </div>
+            <div class="col-md-12 col-sm-12">
+              <h6>Progenitor: <strong>{{ consulta.paciente.progenitor }}</strong></h6>
             </div>
             <div class="col-md-8 col-sm-12">
               <h6>Ocupacion: <em>{{ consulta.paciente.ocupacion }}</em></h6>
@@ -50,319 +42,113 @@
             <div class="col-md-12">
               <h6>Procedencia: <em>{{ consulta.procedencia }}</em></h6>
             </div>
-            {% if form.errors %}
-            <div class="alert alert-danger">
-                {{ form.non_field_errors }}
-                <ul>
+            <div class="col-md-12">
+              <form id="form-guardar" action="{% url 'agenda-editar' pk=consulta.id %}" method="post" autocomplete=off>
+                <div class="hide">
+                  {{ form }}
+                </div>
+                {% csrf_token %}
+                {% if form.errors %}
+                <div class="alert alert-danger">
+                  {{ form.non_field_errors }}
+                  <ul>
                     {% for field in form %}
-                        {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
+                    {% if field.errors %}<li>{{ field.label }}: {{ field.errors|striptags }}</li>{% endif %}
                     {% endfor %}
-                </ul>
+                  </ul>
+                </div>
+                {% endif %}
+                <div class="row">
+                  <div class="col-md-12 b-t">
+                    <small><strong>Motivo de Consulta</strong></small>
+                    {{ form.motivo_consulta }}
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <small><strong>Antecedentes</strong></small>
+                    {{ form.antecedentes }}
+                  </div>
+                </div>
+              </form>
             </div>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-1 col-sm-2 fixribbon">
-          <div class="row">
-            <div class="miribbon col-md-12">Ant.</div>  
-          </div>
-        </div>        
-        <div class="col-md-11 col-sm-10">
-          <div class="row">
-            <div class="col-md-12">
-              {{ form.antocu }}
-            </div>
-            <div class="col-md-12">
-              {{ form.antsis }}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-1 col-sm-2 fixribbon">
-          <div class="row">
-            <div class="miribbon col-md-12">M.C.</div>
-          </div>
-        </div>        
-        <div class="col-md-11 col-sm-10">
-          <div class="row">
-            <div class="col-md-12">
-              {{ form.motivo }}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-1 col-sm-2 fixribbon">
-          <div class="row">
-            <div onclick="agudeza();" class="miribbon col-md-12">A.V.</div>
-          </div>
-        </div>
-        <div class="col-md-11 col-sm-10">
-          <div class="row">
-            <label class="col-md-2 col-form-label p-r-0"> 
-              <h6><strong>S/C</strong></h6>
-            </label>
-            <div class="col-md-5 p-l-0">
-              {{ form.dsc }}
-            </div>
-            <div class="col-md-5 p-l-0">
-              {{ form.isc }}
-            </div>
-          </div>
-          <div class="row">
-            <label class="col-md-2 col-form-label p-r-0"> 
-              <h6><strong>C/C</strong></h6>
-            </label>
-            <div class="col-md-4 p-l-0">
-              {{ form.dcc }}
-            </div>
-            <div class="col-md-2 text-center">
-              {{ form.impav }}
-              <label for="id_impav"><h4 class="m-0"><i class="fa fa-print"></i></h4></label>
-            </div>
-            <div class="col-md-4 p-l-0">
-              {{ form.icc }}
-            </div>
-          </div>
-          <div class="row">
-            <label class="col-md-2 col-form-label p-r-0"> 
-              <h6><strong>Refr.</strong></h6>
-            </label>
-            <div class="col-md-5">
-              <div class="row">
-                <div class="col-md-4 p-l-0">{{ form.dre1 }}</div>
-                <div class="col-md-4 p-l-0">{{ form.dre2 }}</div>
-                <div class="col-md-4 p-l-0">{{ form.dre3 }}</div>
-              </div>
-            </div>
-            <div class="col-md-5">
-              <div class="row">
-                <div class="col-md-4 p-l-0">{{ form.ire1 }}</div>
-                <div class="col-md-4 p-l-0">{{ form.ire2 }}</div>
-                <div class="col-md-4 p-l-0">{{ form.ire3 }}</div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <label class="col-md-2 col-form-label p-r-0"> 
-              <h6><strong>Auto.</strong></h6>
-            </label>
-            <div class="col-md-5 p-l-0">
-              {{ form.dau }}
-            </div>
-            <div class="col-md-5 p-l-0">
-              {{ form.iau }}
-            </div>
-          </div>
-          <div class="row">
-            <label class="col-md-2 col-form-label p-r-0"> 
-              <h6><strong>Cerca</strong></h6>
-            </label>
-            <div class="col-md-5">
-              <div class="row">
-                <div class="col-md-6 p-l-0">{{ form.ddc1 }}</div>
-                <div class="col-md-6 p-l-0">{{ form.ddc2 }}</div>
-              </div>
-            </div>
-            <div class="col-md-5">
-              <div class="row">
-                <div class="col-md-6 p-l-0">{{ form.idc1 }}</div>
-                <div class="col-md-6 p-l-0">{{ form.idc2 }}</div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <label class="col-md-2 col-form-label p-r-0"> 
-              <h6><strong>Pin Hole</strong></h6>
-            </label>
-            <div class="col-md-5 p-l-0">
-              {{ form.dph }}
-            </div>
-            <div class="col-md-5 p-l-0">
-              {{ form.iph }}
-            </div>
-          </div>
-          <div class="row">
-            <label class="col-md-2 col-form-label p-r-0"> 
-              <h6><strong>Ciclopl.</strong></h6>
-            </label>
-            <div class="col-md-5 p-l-0">
-              {{ form.dci }}
-            </div>
-            <div class="col-md-5 p-l-0">
-              {{ form.ici }}
-            </div>
-          </div>
-          <div class="row">
-            <label class="col-md-2 col-form-label p-r-0"> 
-              <h6><strong>Lente</strong></h6>
-            </label>
-            <div class="col-md-5 p-l-0">
-              {{ form.dcl }}
-            </div>
-            <div class="col-md-5 p-l-0">
-              {{ form.icl }}
-            </div>
-          </div>
-          <div class="row">
-            <label class="col-md-2 col-form-label p-r-0"> 
-              <h6><strong>Receta</strong></h6>
-            </label>
-            <div class="col-md-5">
-              <div class="row">
-                <div class="col-md-4 p-l-0">{{ form.drc1 }}</div>
-                <div class="col-md-4 p-l-0">{{ form.drc2 }}</div>
-                <div class="col-md-4 p-l-0">{{ form.drc3 }}</div>
-              </div>
-            </div>
-            <div class="col-md-5">
-              <div class="row">
-                <div class="col-md-4 p-l-0">{{ form.irc1 }}</div>
-                <div class="col-md-4 p-l-0">{{ form.irc2 }}</div>
-                <div class="col-md-4 p-l-0">{{ form.irc3 }}</div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <label class="col-md-2 col-form-label p-r-0">
-              <h6><strong>Adicion</strong></h6>
-            </label>
-            <div class="col-md-10 p-l-0">
-              {{ form.adicion }}
-            </div>
-          </div>
-          <div class="row m-b-10">
-            <label class="col-md-2 col-form-label p-r-0">
-              <h6><strong>Tipo</strong></h6>
-            </label>
-            <div class="col-md-10 p-l-0">
-              <div class="hide">
-                {{ form.tipo_lente }}
-              </div>
-              <select id="selectipo" multiple class="form-control form-control-sm" title="Selecciona Tipo de Lente" tabindex="33" >
-                  {% for item in tipolentes %}
-                    <option>{{ item.nombre }}</option>
-                  {% endfor %}
-              </select>      
-            </div>
-          </div>
-          <div class="row m-b-10">
             <div class="col-md-6">
-            <a href="{% url "agenda-listar" %}" class="btn btn-warning btn-sm" data-toggle="tooltip" data-placement="top" title=""  data-original-title="Volver"><i class="fa fa-rotate-left"></i></a>
-            <a href="{% url 'logout' %}" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top" title=""  data-original-title="Salir"><i class="mdi mdi-exit-to-app"></i></a>
+              <a href="{% url "agenda-listar" %}" class="btn btn-warning btn-sm" data-toggle="tooltip"
+                data-placement="top" title="" data-original-title="Volver"><i class="fa fa-rotate-left"></i></a>
+              <a href="{% url 'logout' %}" class="btn btn-danger btn-sm" data-toggle="tooltip" data-placement="top"
+                title="" data-original-title="Salir"><i class="mdi mdi-exit-to-app"></i></a>
             </div>
             <div class="col-md-6 text-right">
-              {% csrf_token %}
-              <button type="button" class="btn btn-sm btn-info" id="historiac" data-url="{% url 'historiam-lista' pk=consulta.paciente.id id=consulta.id %}" data-toggle="tooltip" data-placement="top" title=""  data-original-title="Historia Clinica"><i class="icon-medical-history"></i></button>
-              <button type="button" class="btn btn-sm btn-agenda text-white" id="recetar"  data-toggle="tooltip" data-placement="top" title=""  data-original-title="Receta"><i class="icon-medicine-2"></i></button>              
-              <a onclick="imprimirlista(event, this);" href="{% url 'reporterecetasegurob' pk=consulta.id %}" class="btn btn-sm btn-primary" data-toggle="tooltip" data-placement="top" title=""  data-original-title="Imprimir"><i class="fa fa-print"></i></a>              
-              <a onclick="imprimirlista(event, this);" href="{% url 'reporterec' pk=consulta.id %}" class="btn btn-sm btn-inverse" data-toggle="tooltip" data-placement="top" title=""  data-original-title="Imprimir"><i class="fa fa-print"></i></a>
+              <button type="button" class="btn btn-sm btn-info" id="historiac"
+                data-url="{% url 'historiam-lista' pk=consulta.paciente.id id=consulta.id %}" data-toggle="tooltip"
+                data-placement="top" title="" data-original-title="Historia Clinica"><i
+                  class="icon-medical-history"></i></button>
+              <button type="button" class="btn btn-sm btn-agenda text-white" id="recetar" data-toggle="tooltip"
+                data-placement="top" title="" data-original-title="Receta"><i class="icon-medicine-2"></i></button>
+              <a onclick="imprimirlista(event, this);" href="{% url 'reporterecetasegurob' pk=consulta.id %}"
+                class="btn btn-sm btn-inverse" data-toggle="tooltip" data-placement="top" title=""
+                data-original-title="Imprimir"><i class="fa fa-print"></i></a>              
             </div>
           </div>
         </div>
       </div>
-      
     </div>
-    <div class="col-md-6 col-sm-12">
-    <div class="row m-b-5">
-        <div class="col-md-1 col-sm-2 fixribbon">
-          <div class="row">
-            <div class="miribbon col-md-12">T.O.</div>
+    <div class="row">
+      <div class="col-md-12 col-sm-12">
+        <div class="ribbon-wrapper card m-b-5">
+          <div class="ribbon ribbon-manantial">
+            Control
           </div>
-        </div>        
-        <div class="col-md-11 col-sm-10">
-          <div class="row">
-            <div class="col-md-6">
-              {{ form.dto }}
-            </div>
-            <div class="col-md-6">             
-              {{ form.ito }}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-1 col-sm-2 fixribbon">
-          <div class="row">
-            <div class="miribbon col-md-12">Bio.</div>
-          </div>
-        </div> 
-        <div class="col-md-11 col-sm-10">
-          <div class="row">
-            <div class="col-md-12">              
-              {{ form.dbio }}
-            </div>
-          </div>
-          <div class="row">
+          <div class="row ribbon-content">
             <div class="col-md-12">
-              {{ form.ibio }}
+              <form id="controlform" action="{% url 'control-crear' %}" method="post">
+                {% csrf_token %}
+                {{ controlform.agenda}}
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="input-group">
+                      {{ controlform.detalle }}
+                      <span class="input-group-btn"><button class="btn btn-manantial btn-sm text-white" type="submit"><i
+                            class="fa fa-plus"></i></span></button>
+                      <span class="input-group-btn"><button class="btn btn-info btn-sm"><i
+                            class="fa fa-search"></i></span></button>
+                    </div>
+                  </div>
+                </div>
+              </form>
             </div>
           </div>
         </div>
-      </div>
-      <div class="row">
-        <div class="col-md-1 col-sm-2 fixribbon">
-          <div class="row">
-            <div class="miribbon col-md-12">F.O.</div>
+      </div>      
+    </div>
+    <div class="row">
+      <div class="col-md-12 col-sm-12">
+        <div class="ribbon-wrapper card m-b-5">
+          <div class="ribbon ribbon-manantial">
+            Diagnostico
           </div>
-        </div>
-        <div class="col-md-11 col-sm-10">
-          <div class="row">
+          <div class="row ribbon-content">
             <div class="col-md-12">
-              {{ form.dfdo }}
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-md-12">
-              {{ form.ifdo }}
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-md-1 col-sm-2 fixribbon">
-          <div class="row">
-            <div class="miribbon col-md-12">Otros</div>
-          </div>
-        </div>
-        <div class="col-md-11 col-sm-10">
-          <div class="row">
-            <div class="col-md-12">
-              {{ form.otros }}
-            </div>
-          </div>
-        </div>
-      </div>  
-    </form>  
-      <div class="row agudeza">
-        <div class="col-md-1 col-sm-2 fixribbon">
-          <div class="row">
-            <div class="miribbon col-md-12">Diag.</div>
-          </div>
-        </div>
-        <div class="col-md-11 col-sm-10">
-          <form id="diagform" action="{% url 'diagnostico-crear' %}" method="post">
-            {% csrf_token %}
-            {{ diagform.agenda}}
-            <div class="row">
-              <div class="col-md-12">
+              <form id="diagform" action="{% url 'diagnostico-crear' %}" method="post">
+                {% csrf_token %}
+                {{ diagform.agenda}}
                 <div class="input-group">
                   {{ diagform.detalle }}
-                  <span class="input-group-btn"><button class="btn btn-success btn-sm" type="submit"><i class="fa fa-plus"></i></button></span>
+                  <span class="input-group-btn"><button class="btn btn-manantial btn-sm text-white" type="submit"><i
+                        class="fa fa-plus"></i></button></span>
                 </div>
-              </div>
+              </form>
             </div>
-          </form>
-          <div class="row">
             <div id="diagnosticos" class="col-md-12">
               <table class="table tabla table-sm">
-              {% for item in consulta.diagnostico_set.all %}
+                {% for item in consulta.diagnostico_set.all %}
                 <tr>
-                  <td width="8%"><h6>{{ forloop.counter }} .-</h6></td>
-                  <td><h6>{{ item.detalle }}</h6></td>
+                  <td width="2%">
+                    <h6>></h6>
+                  </td>
+                  <td>
+                    <h6>{{ item.detalle }}</h6>
+                  </td>
                   <td class="text-right">
                     <form action="{% url 'diagnostico-eliminar' pk=item.id %}" method="post" class="form-eliminar-diag">
                       {% csrf_token %}
@@ -370,215 +156,104 @@
                     </form>
                   </td>
                 </tr>
-              {% endfor %}
+                {% endfor %}
               </table>
             </div>
           </div>
         </div>
       </div>
-      <div class="row agudeza">
-        <div class="col-md-1 col-sm-2 fixribbon">
-          <div class="row">
-            <div class="miribbon col-md-12">Trat.</div>
-          </div>
-        </div>
-        <div class="col-md-11 col-sm-10">
-          <form id="tratform" action="{% url 'tratamiento-crear' %}" method="post">
-            {% csrf_token %}
-            {{ tratform.agenda}}
-            <div class="row">
-              <div class="col-md-12">
-                <div class="input-group">
-                  {{ tratform.detalle }}
-                  <span class="input-group-btn"><button class="btn btn-success btn-sm" type="submit"><i class="fa fa-plus"></i></span></button>
-                </div>
-              </div>
-            </div>
-          </form>
-          <div class="row">
-            <div id="tratamientos" class="col-md-12">
-              <table class="table table-sm tabla">
-              {% for item in consulta.tratamiento_set.all %}
-                <tr>
-                  <td width="8%"><h6>{{ forloop.counter }} .-</h6></td>
-                  <td><h6>{{ item.detalle }}</h6></td>
-                  <td class="text-right"><form action="{% url 'tratamiento-eliminar' pk=item.id %}" method="post" class="form-eliminar-trat">{% csrf_token %}<button type="submit" class="btn btn-xs btn-danger" data-toggle="tooltip" data-original-title="Eliminar"><i class="fa fa-close"></i></button></form></td>
-                </tr>
-              {% endfor %}
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row agudeza">
-        <div class="col-md-1 col-sm-2 fixribbon">
-          <div class="row">
-            <div class="miribbon col-md-12">Ctrl.</div>
-          </div>
-        </div>
-        <div class="col-md-11 col-sm-10">
-          <form id="controlform" action="{% url 'control-crear' %}" method="post">
-            {% csrf_token %}
-            {{ controlform.agenda}}
-            <div class="row">
-              <div class="col-md-12">
-                <div class="input-group">
-                  {{ controlform.detalle }}
-                  <span class="input-group-btn"><button class="btn btn-success btn-sm" type="submit"><i class="fa fa-plus"></i></span></button>
-                </div>
-              </div>
-            </div>
-          </form>
-          <div class="row">
-            <div id="controles" class="col-md-12">
-              <table class="table table-sm tabla">
-              {% for item in consulta.reconsulta_set.all %}
-                <tr>
-                  <td width="8%"><h6>{{ item.fecha | date:"d/m/Y" }}</h6></td>
-                  <td><h6>{{ item.detalle }}</h6></td>
-                  <td class="text-right"><form action="{% url 'control-eliminar' pk=item.id %}" method="post" class="form-eliminar-control">{% csrf_token %}<button type="submit" class="btn btn-xs btn-danger" data-toggle="tooltip" data-original-title="Eliminar"><i class="fa fa-close"></i></button></form></td>
-                </tr>
-              {% endfor %}
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row" id="visor">
-          {% if visor %}
-              <div onclick="agudezaclose();" class="col-md-1 col-sm-2 fixribbon">
-                  <div class="row">
-                    <div class="miribbonav col-md-12">A.V</div>
-                  </div>
-              </div>
-              <div class="col-md-11 col-sm-10">
-                <div class="card">
-                    <div class="row">
-                        <div class="col-md-12 text-center m-t-10">
-                            <h5>{{ visor.fecha }}</h5>
-                        </div>
-                    </div>
-                    <div class="row">
-                       <div class="col-md-12">
-                           <table class="table table-sm table-bordered m-b-0">
-                            <tbody>
-                              <tr class="b-b">
-                                <td width="20%" ><strong><h6 class="m-0"><u>S/C:</u></h6></strong></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.dsc }}</h6></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.isc }}</h6></td>
-                              </tr>
-                              <tr class="b-b">
-                                <td width="20%" ><strong><h6 class="m-0"><u>C/C:</u></h6></strong></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.dcc }}</h6></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.icc }}</h6></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <table class="table table-sm table-bordered m-b-0">
-                            <tbody>
-                              <tr class="b-b">
-                                <td width="20%" ><strong><h6 class="m-0"><u>Refr.:</u></h6></strong></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.dre1 }}</h6></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.dre2 }}</h6></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.dre3 }}</h6></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.ire1 }}</h6></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.ire2 }}</h6></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.ire3 }}</h6></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <table class="table table-sm table-bordered m-b-0">
-                            <tbody>
-                              <tr class="b-b">
-                                <td width="20%" ><strong><h6 class="m-0"><u>Auto.:</u></h6></strong></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.dau }}</h6></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.iau }}</h6></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <table class="table table-sm table-bordered m-b-0">
-                            <tbody>
-                              <tr class="b-b">
-                                <td width="20%" ><strong><h6 class="m-0"><u>Cerca:</u></h6></strong></td>
-                                <td width="20%" class="text-center"><h6 class="m-0">{{ visor.ddc1 }}</h6></td>
-                                <td width="20%" class="text-center"><h6 class="m-0">{{ visor.ddc2 }}</h6></td>
-                                <td width="20%" class="text-center"><h6 class="m-0">{{ visor.idc1 }}</h6></td>
-                                <td width="20%" class="text-center"><h6 class="m-0">{{ visor.idc2 }}</h6></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <table class="table table-sm table-bordered m-b-0">
-                            <tbody>
-                              <tr class="b-b">
-                                <td width="20%" ><strong><h6 class="m-0"><u>Pin Hole:</u></h6></strong></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.dph }}</h6></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.iph }}</h6></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <table class="table table-sm table-bordered m-b-0">
-                            <tbody>
-                              <tr class="b-b">
-                                <td width="20%" ><strong><h6 class="m-0"><u>Ciclopl.:</u></h6></strong></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.dci }}</h6></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.ici }}</h6></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <table class="table table-sm table-bordered m-b-0">
-                            <tbody>
-                              <tr class="b-b">
-                                <td width="20%" ><h6 class="m-0"><u>Lente:</u></h6></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.dcl }}</h6></td>
-                                <td width="40%" class="text-center"><h6 class="m-0">{{ visor.icl }}</h6></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <table class="table table-sm table-bordered m-b-0">
-                            <tbody>
-                              <tr class="b-b">
-                                <td width="20%" ><h6 class="m-0"><u>Receta:</u></h6></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.drc1 }}</h6></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.drc2 }}</h6></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.drc3 }}</h6></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.irc1 }}</h6></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.irc2 }}</h6></td>
-                                <td width="13%" class="text-center"><h6 class="m-0">{{ visor.irc3 }}</h6></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                          <table class="table table-sm table-bordered m-b-0">
-                            <tbody>
-                              <tr class="b-b">
-                                <td width="20%" ><h6 class="m-0"><u>Adicion:</u></h6></td>
-                                <td width="80%" class="text-center"><h6 class="m-0">{{ visor.adicion }}</h6></td>
-                              </tr>
-                            </tbody>
-                          </table>
-                       </div>
-                    </div>
-                </div>
-              </div>
-          {% else %}
-          <div onclick="agudezaclose();" class="col-md-1 col-sm-2 fixribbon">
-                <div class="row">
-                  <div class="miribbonav col-md-12">A.V</div>
-                </div>
-            </div>
-          <div class="col-md-11 col-sm-10">
-            <div class="card">
-                <div class="row">
-                    <div class="col-md-12 text-center m-t-10">
-                        No existen datos anteriores.
-                    </div>
-                </div>
-            </div>
-          </div>
-          {% endif %}
-      </div>
-    </div> 
+    </div>
   </div>
-  <div data-keyboard="true"  id="receta-modal" class="modal fade" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display:none;">
+  <div class="col-md-6 col-sm-12">
+    <div class="row">
+      <div class="col-md-12 col-sm-12">
+        <div class="ribbon-wrapper card m-b-5">
+          <div class="ribbon ribbon-manantial">
+            Descripcion Examen Clinico
+          </div>
+          <div class="row ribbon-content">
+            <div class="col-md-12">
+              <div class="comment-widgets examen-list">
+                <!-- Comment Row -->
+                {% for item in consulta.examenclinico_set.all %}
+                <div class="d-flex flex-row comment-row">
+                  {% if item.archivo %}
+                    <div class="p-2"><img src="/media/{{ item.archivo }}" alt="user" width="200"></div>
+                  {% else %}
+                    <div class="p-2"><img src="/media/imagenes/no-image.png" alt="user" width="200"></div>
+                  {% endif %}
+                  <div class="comment-text w-100">
+                    <h5>{{ item.fecha_archivo }}</h5>
+                    <p class="m-b-5">
+                      {{ item.detalle }}
+                    </p>
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+            <div class="col-md-12 text-right">
+              <button type="button" class="btn btn-manantial text-white" id="examen-clinico" data-toggle="tooltip"
+                data-placement="top" title="" data-original-title="Examen">Registrar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-12 col-sm-12">
+        <div class="ribbon-wrapper card m-b-5">
+          <div class="ribbon ribbon-manantial">
+            Tratamiento
+          </div>
+          <div class="row ribbon-content">
+            <div class="col-md-12">
+              <form id="tratform" action="{% url 'tratamiento-crear' %}" method="post">
+                {% csrf_token %}
+                {{ tratform.agenda}}
+                <div class="row">
+                  <div class="col-md-2">
+                    {{ tratform.cantidad }}
+                  </div>
+                  <div class="col-md-10">
+                    <div class="input-group">
+                      {{ tratform.detalle }}
+                      <span class="input-group-btn"><button class="btn btn-manantial btn-sm text-white" type="submit"><i
+                            class="fa fa-plus"></i></span></button>
+                    </div>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div id="tratamientos" class="col-md-12">
+              <table class="table table-sm table-striped tabla">
+                {% for item in consulta.tratamiento_set.all %}
+                <tr>
+                  <td width="2%">
+                    <h6>></h6>
+                  </td>
+                  <td width="4%">
+                    <h6>{{ item.cantidad }}</h6>
+                  </td>
+                  <td>
+                    <h6>{{ item.detalle }}</h6>
+                  </td>
+                  <td class="text-right">
+                    <form action="{% url 'tratamiento-eliminar' pk=item.id %}" method="post" class="form-eliminar-trat">
+                      {% csrf_token %}<button type="submit" class="btn btn-xs btn-danger" data-toggle="tooltip"
+                      data-original-title="Eliminar"><i class="fa fa-close"></i></button></form>
+                  </td>
+                </tr>
+                {% endfor %}
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div data-keyboard="true" id="receta-modal" class="modal fade" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true" style="display:none;">
     <div class="modal-dialog modal-lg">
       <div id="contenido-modal" class="modal-content">
         <div class="modal-header">
@@ -589,10 +264,10 @@
           <form id="recetaform" action="{% url 'receta-crear' %}" method="post">
             {% csrf_token %}
             {{ recetaform.agenda}}
-            <div class="row">              
+            <div class="row">
               <div class="col-md-6">
                 <small>Medicamento</small>
-                {{ recetaform.medicamento }}                            
+                {{ recetaform.medicamento }}
               </div>
               <div class="col-md-2">
                 <small>Cantidad</small>
@@ -603,19 +278,20 @@
                 {{ recetaform.presentacion }}
               </div>
               <div class="col-md-1 p-t-20">
-                <button class="btn btn-success btn-sm" type="submit"><span class="input-group-btn"><i class="fa fa-plus"></i></span></button>
+                <button class="btn btn-success btn-sm" type="submit"><span class="input-group-btn"><i
+                      class="fa fa-plus"></i></span></button>
               </div>
             </div>
-            <div class="row">              
+            <div class="row">
               <div class="col-md-12">
                 <small>Indicacion</small>
                 {{ recetaform.indicacion }}
-              </div>  
+              </div>
             </div>
           </form>
           <div class="row">
             <div id="recetas" class="col-md-12">
-              <table class="table table-sm table-striped tabla">                
+              <table class="table table-sm table-striped tabla">
                 <thead>
                   <tr>
                     <th>Nombre</th>
@@ -626,29 +302,77 @@
                   </tr>
                 </thead>
                 {% for item in consulta.receta_set.all %}
-                  <tr>
-                    <td><h6>{{ forloop.counter }}</h6></td>
-                    <td><h6>{{ item.medicamento.nombre }}</h6></td>
-                    <td><h6>{{ item.cantidad }}</h6></td>
-                    <td><h6>{{ item.presentacion }}</h6></td>
-                    <td><h6>{{ item.indicacion }}</h6></td>
-                    <td class="text-right"><form action="{% url 'receta-eliminar' pk=item.id %}" method="post" class="form-eliminar-receta">{% csrf_token %}<button type="submit" class="btn btn-xs btn-danger" data-toggle="tooltip" data-original-title="Eliminar"><i class="fa fa-close"></i></button></form></td>
-                  </tr>
+                <tr>
+                  <td>
+                    <h6>{{ forloop.counter }}</h6>
+                  </td>
+                  <td>
+                    <h6>{{ item.medicamento.nombre }}</h6>
+                  </td>
+                  <td>
+                    <h6>{{ item.cantidad }}</h6>
+                  </td>
+                  <td>
+                    <h6>{{ item.presentacion }}</h6>
+                  </td>
+                  <td>
+                    <h6>{{ item.indicacion }}</h6>
+                  </td>
+                  <td class="text-right">
+                    <form action="{% url 'receta-eliminar' pk=item.id %}" method="post" class="form-eliminar-receta">
+                      {% csrf_token %}<button type="submit" class="btn btn-xs btn-danger" data-toggle="tooltip"
+                        data-original-title="Eliminar"><i class="fa fa-close"></i></button></form>
+                  </td>
+                </tr>
                 {% endfor %}
               </table>
             </div>
           </div>
         </div>
         <div class="modal-footer">
-          <a onclick="imprimirlista(event, this);" href="{% url 'reportereceta' pk=consulta.id %}" class="btn btn-inverse" data-toggle="tooltip" data-placement="top" title=""  data-original-title="Imprimir"><i class="fa fa-print"></i></a>
+          <a onclick="imprimirlista(event, this);" href="{% url 'reportereceta' pk=consulta.id %}"
+            class="btn btn-inverse" data-toggle="tooltip" data-placement="top" title=""
+            data-original-title="Imprimir"><i class="fa fa-print"></i></a>
           <button type="button" class="btn btn-danger waves-effect text-left" data-dismiss="modal">Cerrar</button>
         </div>
       </div>
     </div>
   </div>
-{% endblock %}
-{% block js %}
-  <script src="{% static "assets/plugins/bootstrap-selectf/dist/js/bootstrap-select.min.js" %}"></script>
-  <script src="{% static "assets/plugins/select2/dist/js/select2.js" %}" type="text/javascript"></script>
-  <script src="{% static "assets/paginas/agenda/agenda-editar.js" %}"></script>
-{% endblock %}
+  <div data-keyboard="true" id="examen-modal" class="modal fade" role="dialog" aria-labelledby="myModalLabel"
+    aria-hidden="true" style="display:none;">
+    <div class="modal-dialog modal-lg">
+      <div id="contenido-modal" class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Descripcion Examen Clinico</h4>
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        </div>
+        <form id="examenform" action="{% url 'examen-crear' %}" method="post" enctype="multipart/form-data">
+          <div class="modal-body">
+            {% csrf_token %}
+            {{ examenform.agenda}}
+            <div class="row">
+              <div class="col-md-8">
+                <small><strong>Fecha del Archivo</strong></small>
+                {{ examenform.fecha_archivo }}
+                <small><strong>Detalle</strong></small>
+                {{ examenform.detalle }}
+              </div>
+              <div class="col-md-4">
+                {{ examenform.archivo }}
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-manantial waves-effect text-white">Guardar</button>
+            <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">Cerrar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endblock %}
+    {% block js %}
+    <script src="{% static "assets/plugins/bootstrap-selectf/dist/js/bootstrap-select.min.js" %}"></script>
+    <script src="{% static "assets/plugins/select2/dist/js/select2.js" %}" type="text/javascript"></script>
+    <script src="{% static "assets/plugins/dropify/dist/js/dropify.min.js" %}"></script>
+    <script src="{% static "assets/paginas/agenda/agenda-editar.js" %}"></script>
+    {% endblock %}

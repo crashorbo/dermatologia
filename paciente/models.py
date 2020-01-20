@@ -51,13 +51,14 @@ class Paciente(models.Model):
 
   nombres = models.CharField(max_length=100)
   apellidos = models.CharField(max_length=100)
+  progenitor = models.CharField(max_length=200, blank=True)
   fecha_nacimiento = models.DateField(default=datetime.datetime.now)
   documento = models.IntegerField(choices=DOCUMENTO_CHOICE, default=1)
   nro_documento = models.CharField(max_length=20, blank=True)
   direccion = models.TextField(blank=True)
   telefono = models.CharField(max_length=20, blank=True)
   ocupacion = models.CharField(max_length=50, blank=True)
-  codigo = models.TextField(blank=True)
+  email = models.EmailField(max_length=100, blank=True)  
   creado = models.DateTimeField(auto_now=True)
   estado = models.BooleanField(default=True)
   objects = MyModelManager()
@@ -69,8 +70,7 @@ class Paciente(models.Model):
     return [self.nombres+' '+self.apellidos,
       self.DOCUMENTO_PRINT[self.documento],
       self.nro_documento,
-      self.telefono,
-      self.codigo,
+      self.telefono,      
       '<button class="paciente-historial btn btn-xs btn-info" data-url='+reverse('historia-lista',args=[self.id])+'><i class="icon-medical-history"></i></button><button class="paciente-editar btn btn-xs btn-warning m-l-5" data-url='+reverse('paciente-editar', args=[self.id])+'><i class="fa fa-edit"></i></button>']
 
 class Archivopdf(models.Model):

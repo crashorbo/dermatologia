@@ -55,8 +55,8 @@
       <!-- Sidebar scroll-->
       <div class="scroll-sidebar">
         <!-- User profile -->
-        <div class="user-profile p-10" style="background: #fff; height: 140px;">
-          <img src="{% static "assets/images/logoiso.png" %}" class="img-fluid" />
+        <div class="user-profile p-30 align-middle" style="background: #fff; height: 140px;">
+          <img src="{% static "assets/images/logologin.png" %}" class="img-fluid" />
         </div>
         <!-- End User profile text-->
         <!-- Sidebar navigation-->
@@ -71,7 +71,6 @@
               <ul aria-expanded="false" class="collapse">
                 <li><a id="seguros" href="{% url "seguro-ajax-lista" %}">Seguros</a></li>
                 <li><a id="servicios" href="{% url "servicio-ajax-lista" %}">Servicios</a></li>
-                <li><a id="tipolentes" href="{% url "tipolente-ajax-lista" %}">Tipo Lentes</a></li>
                 <li><a id="medicamentos" href="{% url "medicamento-ajax-lista" %}">Medicamentos</a></li>
               </ul>
             </li>
